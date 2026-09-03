@@ -3,8 +3,28 @@ server:
 spring:
   application:
     name: identity-service
+  datasource:
+    url: ${IDENTITY_DB_URL:jdbc:postgresql://localhost:5432/finledger}
+    username: ${IDENTITY_DB_USERNAME:finledger}
+    password: ${IDENTITY_DB_PASSWORD:finledger}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: identity_service
+        format_sql: true
+  flyway:
+    enabled: true
+    default-schema: identity_service
+    schemas: identity_service
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+app:
+  jwt:
+    secret: ${IDENTITY_JWT_SECRET:change-me-to-a-very-long-and-secure-jwt-secret-key-1234567890}
+    access-token-expiration-seconds: ${IDENTITY_JWT_ACCESS_EXP_SECONDS:900}
+    refresh-token-expiration-seconds: ${IDENTITY_JWT_REFRESH_EXP_SECONDS:2592000}
