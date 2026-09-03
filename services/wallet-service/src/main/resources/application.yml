@@ -3,8 +3,26 @@ server:
 spring:
   application:
     name: wallet-service
+  datasource:
+    url: ${WALLET_DB_URL:jdbc:postgresql://localhost:5432/finledger}
+    username: ${WALLET_DB_USERNAME:finledger}
+    password: ${WALLET_DB_PASSWORD:finledger}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: wallet_service
+        format_sql: true
+  flyway:
+    enabled: true
+    default-schema: wallet_service
+    schemas: wallet_service
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+app:
+  jwt:
+    secret: ${WALLET_JWT_SECRET:change-me-to-a-very-long-and-secure-jwt-secret-key-1234567890}
