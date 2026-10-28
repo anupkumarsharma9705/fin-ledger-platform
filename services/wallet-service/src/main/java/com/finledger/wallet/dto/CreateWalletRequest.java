@@ -1,6 +1,7 @@
 package com.finledger.wallet.dto;
 
 import com.finledger.wallet.model.CurrencyCode;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,6 +15,7 @@ public class CreateWalletRequest {
 
     @NotNull
     @DecimalMin(value = "0.00")
+    @Digits(integer = 17, fraction = 2)
     private BigDecimal initialBalance;
 
     @NotNull

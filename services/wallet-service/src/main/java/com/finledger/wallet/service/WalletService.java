@@ -6,10 +6,12 @@ import com.finledger.wallet.dto.WalletBalanceResponse;
 import com.finledger.wallet.exception.ApiException;
 import com.finledger.wallet.model.Wallet;
 import com.finledger.wallet.repository.WalletRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.RoundingMode;
 import java.util.UUID;
 
 @Service
@@ -29,10 +31,19 @@ public class WalletService {
 
         Wallet wallet = new Wallet();
         wallet.setUserId(request.getUserId());
-        wallet.setBalance(request.getInitialBalance());
+        try {
+            wallet.setBalance(request.getInitialBalance().setScale(2, RoundingMode.UNNECESSARY));
+        } catch (ArithmeticException ex) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Initial balance scale must be 2 decimal places");
+        }
         wallet.setCurrency(request.getCurrency());
 
-        Wallet savedWallet = walletRepository.save(wallet);
+        Wallet savedWallet;
+        try {
+            savedWallet = walletRepository.save(wallet);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ApiException(HttpStatus.CONFLICT, "Wallet already exists for user");
+        }
         return new CreateWalletResponse(
                 savedWallet.getId(),
                 savedWallet.getUserId(),
